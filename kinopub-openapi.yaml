@@ -26,7 +26,7 @@ components:
         - $ref: '#/components/schemas/MovieType'
         - $ref: '#/components/schemas/SerialType'
         - type: string
-          enum: [docu, music, tvshow serial, 3d, 4k]
+          enum: [docu, music, tvshow, serial, 3d, 4k]
     GeneralError:
       type: object
       properties:
