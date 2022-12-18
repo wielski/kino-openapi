@@ -1,0 +1,117 @@
+openapi: '3.0.0'
+info:
+  title: Kinopub OAuth API
+  description: https://www.kinoapi.com/index.html
+  version: '1.3'
+servers:
+  - url: https://api.service-kp.com/oauth2
+    description: The production API server
+components:
+  schemas:
+    GetDeviceCode:
+      type: object
+      properties:
+        grant_type:
+          type: string
+          enum: [device_code]
+        client_id:
+          type: string
+        client_secret:
+          type: string
+    GetAccessToken:
+      type: object
+      properties:
+        grant_type:
+          type: string
+          enum: [device_token]
+        code:
+          type: string
+        client_id:
+          type: string
+        client_secret:
+          type: string
+    RefreshAccessToken:
+      type: object
+      properties:
+        grant_type:
+          type: string
+          enum: [refresh_token]
+        refresh_token:
+          type: string
+        client_id:
+          type: string
+        client_secret:
+          type: string
+    AuthError:
+      type: object
+      properties:
+        error:
+          type: string
+        error_description:
+          type: string
+    AuthDeviceCode:
+      type: object
+      properties:
+        code:
+          type: string
+        user_code:
+          type: string
+        verification_uri:
+          type: string
+        expires_in:
+          type: integer
+          format: int64
+        interval:
+          type: integer
+          format: int64
+    AuthAccessToken:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+        refresh_token:
+          type: string
+        expires_in:
+          type: integer
+          format: int64
+  responses:
+    NotFound:
+      description: Entity not found.
+    IllegalInput:
+      description: Illegal input for operation.
+    AuthError:
+      description: General Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthError'
+paths:
+  /device:
+    post:
+      operationId: deviceAuth
+      description: OAuth Device Authentication Flow
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/GetDeviceCode'
+                - $ref: '#/components/schemas/GetAccessToken'
+                - $ref: '#/components/schemas/RefreshAccessToken'
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/AuthDeviceCode'
+                  - $ref: '#/components/schemas/AuthAccessToken'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthError'

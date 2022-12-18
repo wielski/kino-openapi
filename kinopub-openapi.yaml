@@ -1,0 +1,2543 @@
+openapi: '3.0.0'
+info:
+  title: Kinopub API
+  description: https://www.kinoapi.com/index.html
+  version: '1.3'
+servers:
+  - url: https://api.service-kp.com/{basePath}
+    description: The production API server
+    variables:
+      basePath:
+        default: v1
+components:
+  schemas:
+    Status:
+      type: integer
+      format: int32
+      enum: [-1, 0, 1]
+    MovieType:
+      type: string
+      enum: [movie, documovie, concert]
+    SerialType:
+      type: string
+      enum: [serial, docuserial]
+    Type:
+      allOf:
+        - $ref: '#/components/schemas/MovieType'
+        - $ref: '#/components/schemas/SerialType'
+        - type: string
+          enum: [docu, music, tvshow serial, 3d, 4k]
+    GeneralError:
+      type: object
+      properties:
+        name:
+          type: string
+        message:
+          type: string
+        code:
+          type: integer
+          format: int64
+        status:
+          type: integer
+          format: int64
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+        current:
+          type: integer
+          format: int64
+        perpage:
+          type: integer
+          format: int64
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        reg_date:
+          type: string
+        subscription:
+          type: object
+          properties:
+            active:
+              type: boolean
+            end_time:
+              type: integer
+              format: int64
+            days:
+              type: number
+              format: double
+        profile:
+          type: object
+          properties:
+            name:
+              type: string
+            avatar:
+              type: string
+    ServerLocation:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        location:
+          type: string
+        name:
+          type: string
+    StreamingType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+    VoiceoverType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        short_title:
+          type: string
+    VoiceoverAuthor:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        short_title:
+          type: string
+    VideoQuality:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        quality:
+          type: integer
+          format: int32
+    Device:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        hardware:
+          type: string
+        software:
+          type: string
+        created:
+          type: integer
+          format: int64
+        updated:
+          type: integer
+          format: int64
+        last_seen:
+          type: integer
+          format: int64
+        is_browser:
+          type: integer
+          format: int64
+        settings:
+          type: object
+          additionalProperties:
+            oneOf:
+              - $ref: '#/components/schemas/CheckboxSetting'
+              - $ref: '#/components/schemas/SelectSetting'
+    CheckboxSetting:
+      type: object
+      properties:
+        label:
+          type: string
+        value:
+          type: integer
+          format: int32
+    SelectSetting:
+      type: object
+      properties:
+        type:
+          type: string
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/SelectSettingOption'
+    SelectSettingOption:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        label:
+          type: string
+        description:
+          type: string
+        selected:
+          type: integer
+          format: int32
+    ContentType:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+    Genre:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        type:
+          $ref: '#/components/schemas/Type'
+    Country:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+    Posters:
+      type: object
+      properties:
+        small:
+          type: string
+        medium:
+          type: string
+        big:
+          type: string
+        wide:
+          type: string
+    AudioInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        index:
+          type: integer
+          format: int32
+        codec:
+          type: string
+        channels:
+          type: integer
+          format: int32
+        lang:
+          type: string
+        type:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+            title:
+              type: string
+            short_title:
+              type: string
+              nullable: true
+        author:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+            title:
+              type: string
+            short_title:
+              type: string
+              nullable: true
+    Subtitle:
+      type: object
+      properties:
+        lang:
+          type: string
+        shift:
+          type: integer
+          format: int64
+        embed:
+          type: boolean
+        file:
+          type: string
+        url:
+          type: string
+    WatchingStatus:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/Status'
+        time:
+          type: integer
+          format: int64
+          nullable: true
+    VideoWatchingStatus:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        number:
+          type: integer
+          format: int64
+        title:
+          type: string
+        duration:
+          type: integer
+          format: int64
+        status:
+          $ref: '#/components/schemas/Status'
+        time:
+          type: integer
+          format: int64
+          nullable: true
+        updated:
+          type: integer
+          format: int64
+    SeasonWatchingStatus:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        number:
+          type: integer
+          format: int64
+        status:
+          $ref: '#/components/schemas/Status'
+        episodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/EpisodeWatchingStatus'
+    EpisodeWatchingStatus:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        number:
+          type: integer
+          format: int64
+        title:
+          type: string
+        duration:
+          type: integer
+          format: int64
+        status:
+          $ref: '#/components/schemas/Status'
+        time:
+          type: integer
+          format: int64
+          nullable: true
+        updated:
+          type: integer
+          format: int64
+    File:
+      type: object
+      properties:
+        codec:
+          type: string
+        w:
+          type: integer
+          format: int32
+        h:
+          type: integer
+          format: int32
+        quality:
+          type: string
+        quality_id:
+          type: integer
+          format: int64
+        file:
+          type: string
+        urls: # or url? found in real item api
+          type: object
+          properties:
+            http:
+              type: string
+            hls:
+              type: string
+            hls2:
+              type: string
+            hls4:
+              type: string
+    Video:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        thumbnail:
+          type: string
+        tracks:
+          type: integer
+          format: int32
+        ac3:
+          type: integer
+          format: int32
+        watched:
+          type: integer
+          format: int32
+        watching:
+          type: object
+          $ref: '#/components/schemas/WatchingStatus'
+        subtitles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subtitle'
+    Episode:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        thumbnail:
+          type: string
+        tracks:
+          type: integer
+          format: int32
+        ac3:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        snumber:
+          type: integer
+          format: int32
+        watched:
+          type: integer
+          format: int32
+        watching:
+          type: object
+          $ref: '#/components/schemas/WatchingStatus'
+        subtitles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subtitle'
+    Season:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        number:
+          type: integer
+          format: int32
+        title:
+          type: string
+        episodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Episode'
+    ItemInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        type:
+          $ref: '#/components/schemas/Type'
+        subtype:
+          type: string
+        year:
+          type: integer
+          format: int64
+        cast:
+          type: string
+        director:
+          type: string
+        voice:
+          type: string
+        duration:
+          type: object
+          properties:
+            average:
+              type: integer
+              format: int64
+            total:
+              type: integer
+              format: int64
+        langs:
+          type: integer
+          format: int32
+        ac3:
+          type: integer
+          format: int32
+        subtitles:
+          type: integer
+          format: int32
+        quality:
+          type: integer
+          format: int32
+        genres:
+          type: array
+          items:
+            $ref: '#/components/schemas/Genre'
+        countries:
+          type: array
+          items:
+            $ref: '#/components/schemas/Country'
+        plot:
+          type: string
+        tracklist:
+          type: array
+          items:
+            type: object
+            properties:
+              artist:
+                type: string
+              title:
+                type: string
+              url:
+                type: string
+        imdb:
+          type: integer
+          format: int32
+        imdb_rating:
+          type: integer
+          format: int32
+        imdb_votes:
+          type: integer
+          format: int32
+        kinopoisk:
+          type: integer
+          format: int32
+        kinopoisk_rating:
+          type: integer
+          format: int32
+        kinopoisk_votes:
+          type: integer
+          format: int32
+        rating:
+          type: integer
+          format: int32
+        views:
+          type: integer
+          format: int32
+        comments:
+          type: integer
+          format: int32
+        finished:
+          type: boolean
+        advert:
+          type: boolean
+        in_watchlist:
+          type: boolean
+        subscribed:
+          type: boolean
+        posters:
+          $ref: '#/components/schemas/Posters'
+        trailer:
+          type: object
+          properties:
+            id:
+              type: string
+            url:
+              type: string
+    MovieItem:
+      allOf:
+        - $ref: '#/components/schemas/ItemInfo'
+        - type: object
+          properties:
+            videos:
+              type: array
+              items:
+                $ref: '#/components/schemas/Video'
+    SerialItem:
+      allOf:
+        - $ref: '#/components/schemas/ItemInfo'
+        - type: object
+          properties:
+            seasons:
+              type: array
+              items:
+                $ref: '#/components/schemas/Season'
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        depth:
+          type: integer
+          format: int64
+        unread:
+          type: boolean
+        deleted:
+          type: boolean
+        message:
+          type: string
+        created:
+          type: integer
+          format: int64
+        rating:
+          type: integer
+          format: int32
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+            name:
+              type: string
+            avatar:
+              type: string
+    Trailer:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        url:
+          type: string
+        files:
+          type: array
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+              quality:
+                type: integer
+                format: int32
+              width:
+                type: integer
+                format: int32
+              height:
+                type: integer
+                format: int32
+    TVChannel:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        name:
+          type: string
+        stream:
+          type: string
+        logos:
+          type: object
+          properties:
+            s:
+              type: string
+    BookmarkFolder:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        views:
+          type: integer
+          format: int64
+        count:
+          type: integer
+          format: int64
+        created:
+          type: integer
+          format: int64
+        updated:
+          type: integer
+          format: int64
+    WatchingMovie:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        type:
+          $ref: '#/components/schemas/MovieType'
+        subtype:
+          type: string
+        title:
+          type: string
+        posters:
+          $ref: '#/components/schemas/Posters'
+    WatchingSeries:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        type:
+          $ref: '#/components/schemas/SerialType'
+        subtype:
+          type: string
+        title:
+          type: string
+        posters:
+          $ref: '#/components/schemas/Posters'
+        total:
+          type: integer
+          format: int64
+        watched:
+          type: integer
+          format: int64
+        new:
+          type: integer
+          format: int64
+    CollectionItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        watchers:
+          type: integer
+          format: int64
+        views:
+          type: integer
+          format: int64
+        created:
+          type: integer
+          format: int64
+        updated:
+          type: integer
+          format: int64
+        posters:
+          $ref: '#/components/schemas/Posters'
+    HistoryItem:
+      type: object
+      properties:
+        time:
+          type: integer
+          format: int32
+        counter:
+          type: integer
+          format: int32
+        first_seen:
+          type: integer
+          format: int64
+        last_seen:
+          type: integer
+          format: int64
+        item:
+          $ref: '#/components/schemas/ItemInfo'
+        media:
+          oneOf:
+            - $ref: '#/components/schemas/Video'
+            - $ref: '#/components/schemas/Episode'
+  requestBodies:
+    UpdateDeviceSettings:
+      description: Map with setting key and value
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties:
+              oneOf:
+                - type: boolean
+                - type: string
+                - type: integer
+                  format: int32
+    CreateBookmarkFolder:
+      description: Object with title
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+    RemoveBookmarkFolder:
+      description: Object with folder id
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              folder:
+                type: integer
+                format: int64
+    AddItemToBookmarkFolder:
+      description: Object with item id and folder id
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              item:
+                type: integer
+                format: int64
+              folder:
+                type: integer
+                format: int64
+    RemoveItemFromBookmarkFolder:
+      description: Object with item id and folder id
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              item:
+                type: integer
+                format: int64
+              folder:
+                type: integer
+                format: int64
+    ToggleItemInBookmarkFolder:
+      description: Object with item id and folder id
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              item:
+                type: integer
+                format: int64
+              folder:
+                type: integer
+                format: int64
+    ClearHistoryForMedia:
+      description: Object with media id
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+    ClearHistoryForSeason:
+      description: Object with season id
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+    ClearHistoryForItem:
+      description: Object with item id
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+  responses:
+    NotFound:
+      description: Entity not found.
+    IllegalInput:
+      description: Illegal input for operation.
+    GeneralError:
+      description: General Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GeneralError'
+  securitySchemes:
+    access_token:
+      type: apiKey
+      name: access_token
+      in: query
+    # there is no yet Device Authentication Flow (rfc8628) in openapi
+    # oauth:
+    #   type: oauth2
+    #   flows:
+paths:
+  /user:
+    get:
+      operationId: getCurrentUser
+      description: Returns current user information
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/GeneralError'
+  /references/server-location:
+    get:
+      operationId: getServerLocations
+      description: Returns server locations
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ServerLocation'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GeneralError'
+  /references/streaming-type:
+    get:
+      operationId: getStreamingTypes
+      description: Returns streaming types
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StreamingType'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /references/voiceover-type:
+    get:
+      operationId: getVoiceoverTypes
+      description: Returns voiceover types
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VoiceoverType'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /references/voiceover-author:
+    get:
+      operationId: getVoiceoverAuthors
+      description: Returns voiceover authors
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VoiceoverAuthor'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /references/video-quality:
+    get:
+      operationId: getVideoQualities
+      description: Returns available video qualities
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VoiceoverAuthor'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /device:
+    get:
+      operationId: getDevicesList
+      description: Returns devices list
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  devices:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Device'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /device/unlink:
+    post:
+      operationId: unlinkCurrentDevice
+      description: Unlink current device
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    format: int32
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /device/{id}/remove:
+    post:
+      operationId: removeDeviceById
+      description: Remove device by id
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    format: int32
+                  current:
+                    type: boolean
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id of device
+          schema:
+            type: integer
+            format: int64
+  /device/{id}:
+    get:
+      operationId: getDeviceById
+      description: Returns device by id
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  device:
+                    $ref: '#/components/schemas/Device'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id of device
+          schema:
+            type: integer
+            format: int64
+  /device/current:
+    get:
+      operationId: getCurrentDevice
+      description: Returns current device
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  device:
+                    $ref: '#/components/schemas/Device'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /device/{id}/settings:
+    get:
+      operationId: getDeviceSettings
+      description: Returns device settings
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  settings:
+                    type: object
+                    additionalProperties:
+                      oneOf:
+                        - $ref: '#/components/schemas/CheckboxSetting'
+                        - $ref: '#/components/schemas/SelectSetting'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id of device
+          schema:
+            type: integer
+            format: int64
+    post:
+      operationId: updateDeviceSettings
+      description: Update device settings
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateDeviceSettings'
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    format: int32
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id of device
+          schema:
+            type: integer
+            format: int64
+  /types:
+    get:
+      operationId: getContentTypes
+      description: Returns content types
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContentType'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /genres:
+    get:
+      operationId: getGenres
+      description: Returns genres
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Genre'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /countries:
+    get:
+      operationId: getCountries
+      description: Returns countries
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Country'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /items:
+    get:
+      operationId: getItemsByFilter
+      description: Returns items by filter
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ItemInfo'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: type
+          in: query
+          description: Video content types
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+        - name: title
+          in: query
+          description: Search by title
+          schema:
+            type: string
+        - name: genre
+          in: query
+          description: Genres
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int64
+          style: form
+          explode: false
+        - name: country
+          in: query
+          description: Countries
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int64
+          style: form
+          explode: false
+        - name: year
+          in: query
+          description: Year or year interval (delimeted by -)
+          schema:
+            type: string
+        - name: finished
+          in: query
+          description: Finished status, 0 or 1
+          schema:
+            type: integer
+            format: int64
+            enum: [0, 1]
+        - name: actor
+          in: query
+          description: Actors. Actor1,Actor2+Actor3
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+        - name: letter
+          in: query
+          description: First letter of title
+          schema:
+            type: string
+        - name: conditions
+          in: query
+          description: Simple conditions for filter
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+              year:
+                type: integer
+                format: int32
+              title:
+                type: string
+              created:
+                type: integer
+                format: int64
+              updated:
+                type: integer
+                format: int64
+              rating:
+                type: integer
+                format: int32
+              views:
+                type: integer
+                format: int64
+              watchers:
+                type: integer
+                format: int64
+          style: form
+          explode: false
+        - name: force
+          in: query
+          description: Skip quality filters
+          schema:
+            type: string
+            enum: ['quality', 'advert', 'erotic']
+        - name: sort
+          in: query
+          description: Sort by field. Char '-' at the end is DESC
+          schema:
+            type: string
+            enum:
+              [
+                'id',
+                'year',
+                'title',
+                'created',
+                'updated',
+                'rating',
+                'views',
+                'watchers',
+                'id-',
+                'year-',
+                'title-',
+                'created-',
+                'updated-',
+                'rating-',
+                'views-',
+                'watchers-',
+              ]
+        - name: quality
+          in: query
+          description: Quality
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int64
+          style: form
+          explode: false
+        - name: perpage
+          in: query
+          description: Results on one page
+          schema:
+            type: integer
+            format: int64
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            format: int64
+  /items/search:
+    get:
+      operationId: searchItems
+      description: Search items
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    oneOf:
+                      - type: array
+                        items:
+                          $ref: '#/components/schemas/ItemInfo'
+                      - type: object
+                        properties:
+                          movie:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ItemInfo'
+                          serial:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ItemInfo'
+                          3d:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ItemInfo'
+                          concert:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ItemInfo'
+                          documovie:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ItemInfo'
+                          docuserial:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ItemInfo'
+                          tvshow:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ItemInfo'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: q
+          in: query
+          description: Search query
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: Video content types
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+        - name: field
+          in: query
+          description: Search in field
+          schema:
+            type: string
+            enum: ['title', 'director', 'cast']
+        - name: perpage
+          in: query
+          description: Results on one page
+          schema:
+            type: integer
+            format: int64
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            format: int64
+        - name: sectioned
+          in: query
+          description: Sectioned 1 or 0. Defines output type, if 1 -
+          schema:
+            type: integer
+            format: int32
+            enum: [0, 1]
+  /items/similar:
+    get:
+      operationId: getSimilarItems
+      description: Returns items by filter
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ItemInfo'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: id
+          in: query
+          description: Item id
+          schema:
+            type: integer
+            format: int64
+  /items/{id}:
+    get:
+      operationId: getItem
+      description: Returns item by id
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  item:
+                    oneOf:
+                      - $ref: '#/components/schemas/MovieItem'
+                      - $ref: '#/components/schemas/SerialItem'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Item id
+          schema:
+            type: integer
+            format: int64
+  /items/media-links:
+    get:
+      operationId: getMediaLinks
+      description: Returns files and subtitles
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  files:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/File'
+                  subtitles:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Subtitle'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: mid
+          in: query
+          description: Media id
+          schema:
+            type: integer
+            format: int64
+  /items/media-video-link:
+    get:
+      operationId: getMediaVideoLink
+      description: Returns url by file path and streaming type
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: file
+          in: query
+          description: File path
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: Streaming type
+          schema:
+            type: string
+            enum: [http, hls, hls2, hls4]
+  /items/vote:
+    get:
+      operationId: voteForItem
+      description: Vote for item
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  voted:
+                    type: boolean
+                  total:
+                    type: string
+                  positive:
+                    type: string
+                  negative:
+                    type: string
+                  rating:
+                    type: string
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: id
+          in: query
+          description: Item id
+          schema:
+            type: integer
+            format: int64
+        - name: like
+          in: query
+          description: Like or not (1/0)
+          schema:
+            type: integer
+            format: int32
+            enum: [0, 1]
+  /items/comments:
+    get:
+      operationId: getItemComments
+      description: Item comments
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  comments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Comment'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: id
+          in: query
+          description: Item id
+          schema:
+            type: integer
+            format: int64
+  /items/trailer:
+    get:
+      operationId: getItemTrailer
+      description: Item trailer
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  trailer:
+                    $ref: '#/components/schemas/Trailer'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: id
+          in: query
+          description: Item id
+          schema:
+            type: integer
+            format: int64
+        - name: sid
+          in: query
+          description: Trailer id
+          schema:
+            type: string
+  /items/fresh:
+    get:
+      operationId: getFreshItems
+      description: Fresh items shortcut
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ItemInfo'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: type
+          in: query
+          description: Video content types
+          schema:
+            type: array
+            items:
+              type: string
+        - name: perpage
+          in: query
+          description: Results on one page
+          schema:
+            type: integer
+            format: int64
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            format: int64
+  /items/hot:
+    get:
+      operationId: getHotItems
+      description: Hot items shortcut
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ItemInfo'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: type
+          in: query
+          description: Video content types
+          schema:
+            type: array
+            items:
+              type: string
+        - name: perpage
+          in: query
+          description: Results on one page
+          schema:
+            type: integer
+            format: int64
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            format: int64
+  /items/popular:
+    get:
+      operationId: getPopularItems
+      description: Popular items shortcut
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ItemInfo'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: type
+          in: query
+          description: Video content types
+          schema:
+            type: array
+            items:
+              type: string
+        - name: perpage
+          in: query
+          description: Results on one page
+          schema:
+            type: integer
+            format: int64
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            format: int64
+  /tv:
+    get:
+      operationId: getTvChannels
+      description: TV channels list
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  channels:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TVChannel'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /bookmarks:
+    get:
+      operationId: getBookmarkFolders
+      description: Get bookmark folders
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BookmarkFolder'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /bookmarks/{id}:
+    get:
+      operationId: getBookmarkItems
+      description: Get bookmark folder items
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  folder:
+                    $ref: '#/components/schemas/BookmarkFolder'
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ItemInfo'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Id of bookmark
+          schema:
+            type: integer
+            format: int64
+  /bookmarks/get-item-folders:
+    get:
+      operationId: getBookmarkFoldersByItem
+      description: Get bookmark folders list by item id
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  folders:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BookmarkFolder'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: item
+          in: query
+          description: Item id
+          schema:
+            type: integer
+            format: int64
+  /bookmarks/create:
+    post:
+      operationId: createBookmarkFolder
+      description: Create bookmark folder
+      requestBody:
+        $ref: '#/components/requestBodies/CreateBookmarkFolder'
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  folder:
+                    $ref: '#/components/schemas/BookmarkFolder'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /bookmarks/add:
+    post:
+      operationId: addItemToBookmarkFolder
+      description: Add item to bookmark folder
+      requestBody:
+        $ref: '#/components/requestBodies/AddItemToBookmarkFolder'
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    format: int32
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /bookmarks/remove-folder:
+    post:
+      operationId: removeBookmarkFolder
+      description: Remove bookmark folder
+      requestBody:
+        $ref: '#/components/requestBodies/RemoveBookmarkFolder'
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    format: int32
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /bookmarks/remove-item:
+    post:
+      operationId: removeItemFromBookmarkFolder
+      description: Remove item from bookmark folder
+      requestBody:
+        $ref: '#/components/requestBodies/RemoveItemFromBookmarkFolder'
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    format: int32
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /bookmarks/toggle-item:
+    post:
+      operationId: toggleItemInBookmarkFolder
+      description: Toggle item in bookmark folder. Add or remove based on state
+      requestBody:
+        $ref: '#/components/requestBodies/ToggleItemInBookmarkFolder'
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    format: int32
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /watching:
+    get:
+      operationId: getWatchingStatus
+      description: Get watching status of item
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  item:
+                    oneOf:
+                      - type: object
+                        properties:
+                          id:
+                            type: integer
+                            format: int64
+                          title:
+                            type: string
+                          type:
+                            $ref: '#/components/schemas/SerialType'
+                          seasons:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/SeasonWatchingStatus'
+                      - type: object
+                        properties:
+                          id:
+                            type: integer
+                            format: int64
+                          title:
+                            type: string
+                          type:
+                            $ref: '#/components/schemas/MovieType'
+                          videos:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/VideoWatchingStatus'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: Item id
+          schema:
+            type: integer
+            format: int64
+        - name: video
+          in: query
+          description: Video number
+          schema:
+            type: integer
+            format: int64
+        - name: season
+          in: query
+          description: Season number (only for series)
+          schema:
+            type: integer
+            format: int64
+  /watching/movies:
+    get:
+      operationId: getWatchingMovies
+      description: Get watching movies
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WatchingMovie'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /watching/serials:
+    get:
+      operationId: getWatchingSeries
+      description: Get watching series
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WatchingSeries'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: subscribed
+          in: query
+          required: true
+          description: Show only subscribed series if 1
+          schema:
+            type: integer
+            format: int32
+            enum: [0, 1]
+  /watching/marktime:
+    get:
+      operationId: addTimeMark
+      description: Mark watching time
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    format: int32
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: Item id
+          schema:
+            type: integer
+            format: int64
+        - name: video
+          in: query
+          required: true
+          description: Video id
+          schema:
+            type: integer
+            format: int64
+        - name: time
+          in: query
+          required: true
+          description: Time in seconds
+          schema:
+            type: integer
+            format: int64
+        - name: season
+          in: query
+          required: true
+          description: Seson number (only for series)
+          schema:
+            type: integer
+            format: int32
+  /watching/togglewatchlist:
+    get:
+      operationId: toggleWatchList
+      description: Toggle watchlist (for series)
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    format: int32
+                  watching:
+                    type: boolean
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: Series item id
+          schema:
+            type: integer
+            format: int64
+  /watching/toggle:
+    get:
+      operationId: toggleWatchedStatus
+      description: Toggle watched status
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    format: int32
+                  watched:
+                    type: integer
+                    format: int32
+                    enum: [0, 1]
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: Item id
+          schema:
+            type: integer
+            format: int64
+        - name: video
+          in: query
+          required: true
+          description: Video id
+          schema:
+            type: integer
+            format: int64
+        - name: season
+          in: query
+          required: true
+          description: Seson number (only for series)
+          schema:
+            type: integer
+            format: int32
+  /collections:
+    get:
+      operationId: getCollectionList
+      description: Get collections list
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CollectionItem'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: title
+          in: query
+          required: true
+          description: Title for search
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: Sort by field. Char '-' at the end is DESC
+          schema:
+            type: string
+            enum:
+              [
+                'id',
+                'title',
+                'created',
+                'updated',
+                'views',
+                'watchers',
+                'id-',
+                'title-',
+                'created-',
+                'updated-',
+                'views-',
+                'watchers-',
+              ]
+        - name: perpage
+          in: query
+          description: Results on one page
+          schema:
+            type: integer
+            format: int64
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            format: int64
+  /collections/view:
+    get:
+      operationId: getCollection
+      description: Get collection
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  collection:
+                    $ref: '#/components/schemas/CollectionItem'
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ItemInfo'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: id
+          in: query
+          description: Collection id
+          schema:
+            type: integer
+            format: int64
+  /history:
+    get:
+      operationId: getHistory
+      description: Returns history of views
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  history:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/HistoryItem'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+      parameters:
+        - name: perpage
+          in: query
+          description: Results on one page
+          schema:
+            type: integer
+            format: int64
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            format: int64
+  /history/clear-for-media:
+    post:
+      operationId: clearHistoryForMedia
+      description: Clear history by media id
+      requestBody:
+        $ref: '#/components/requestBodies/ClearHistoryForMedia'
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    format: int32
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /history/clear-for-season:
+    post:
+      operationId: clearHistoryForSeason
+      description: Clear history by season id
+      requestBody:
+        $ref: '#/components/requestBodies/ClearHistoryForSeason'
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    format: int32
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /history/clear-for-item:
+    post:
+      operationId: clearHistoryForItem
+      description: Clear history by item id
+      requestBody:
+        $ref: '#/components/requestBodies/ClearHistoryForItem'
+      responses:
+        '200':
+          description: success result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    format: int32
+        default:
+          description: error payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
