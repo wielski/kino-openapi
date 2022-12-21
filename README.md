@@ -1,2 +1,2 @@
-# kinopub-openapi
-OpenAPI specification for kinopub API
+# kino-openapi
+OpenAPI specification for pub API
